@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# JavaScript
+node_modules/
+dist/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+
+# macOS and editors
+.DS_Store
+.idea/
+.vscode/
