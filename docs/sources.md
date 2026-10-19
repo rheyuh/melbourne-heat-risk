@@ -20,8 +20,8 @@ Storage CRS for the database: GDA2020 (EPSG:7844).
 - Format: GeoPackage (`.gpkg`), with ISO metadata `.xml` per layer
 - CRS: GDA2020 geographic (EPSG:7844). Matches the storage CRS, so no reprojection needed.
 - Local path: `data/raw/abs_asgs_2021/ASGS_2021_Main_Structure_GDA2020.gpkg`
-- Coverage: All of Australia, 2,473 SA2s. Greater Melbourne: TODO SA2s
-  (filter `GCCSA_CODE_2021`).
+- Coverage: All of Australia, 2,473 SA2s. Greater Melbourne: 361 SA2s
+  (filter `GCCSA_CODE_2021 = '2GMEL'`).
 - Key fields:
   - `SA2_CODE_2021` (TEXT(9)): join key for SEIFA
   - `SA2_NAME_2021`: display name
@@ -32,8 +32,8 @@ Storage CRS for the database: GDA2020 (EPSG:7844).
   - `geom`: geometry; the file includes a spatial index
 - Gotchas:
   - 19 rows have no geometry: "Migratory - Offshore - Shipping" and "No usual address", one
-    of each per state and territory (Victoria: `297979799`, `299999499`). TODO: check whether
-    any fall inside the Greater Melbourne filter.
+    of each per state and territory (Victoria: `297979799`, `299999499`). They have their own
+    GCCSA codes (Victoria: `29799`, `29499`), so the `'2GMEL'` filter already excludes them.
   - Codes are text, not numbers. Keep them as text when joining.
   - Must match SEIFA 2021, so use ASGS Edition 3 (2021), not Edition 4 (2026).
 
@@ -43,7 +43,7 @@ Storage CRS for the database: GDA2020 (EPSG:7844).
 - Dataset: Socio-Economic Indexes for Areas (SEIFA), Australia, 2021: Statistical Area Level 2,
   Indexes
 - Sheets in file: Contents, Table 1 (summary of all four indexes, rounded), Table 2 (IRSD),
-  Table 3 (IRSAD), Tables 4–6 (TODO: check the Contents sheet), Explanatory Notes
+  Table 3 (IRSAD), Table 4 (IER), Table 5 (IEO), Table 6 (Excluded Areas), Explanatory Notes
 - Sheet used: `Table 2` (IRSD, unrounded scores)
 - Page URL: https://www.abs.gov.au/statistics/people/people-and-communities/socio-economic-indexes-areas-seifa-australia/2021
 - File URL: https://www.abs.gov.au/statistics/people/people-and-communities/socio-economic-indexes-areas-seifa-australia/2021/Statistical%20Area%20Level%202%2C%20Indexes%2C%20SEIFA%202021.xlsx
@@ -54,7 +54,8 @@ Storage CRS for the database: GDA2020 (EPSG:7844).
 - CRS: None. It is a table with no geometry and joins to SA2 boundaries on the SA2 code.
 - Local path: `data/raw/abs_seifa_2021/Statistical Area Level 2, Indexes, SEIFA 2021.xlsx`
 - Coverage: All of Australia, 2,353 SA2s. Every code exists in ASGS 2021; 120 ASGS SA2s have no
-  SEIFA row (no or very few residents). 5 Greater Melbourne SA2s have no IRSD score.
+  SEIFA row (no or very few residents; Table 6 lists the excluded areas). 5 Greater Melbourne
+  SA2s have no IRSD score.
 - Key fields (Table 2, by column position; the header is on spreadsheet row 6):
   - SA2 9-digit code: join key
   - SA2 name
@@ -86,6 +87,10 @@ Storage CRS for the database: GDA2020 (EPSG:7844).
   emails a download link. Order settings: File Geodatabase, GDA2020 geographic, whole dataset,
   no buffer.
 - Data dictionary: https://www.planning.vic.gov.au/__data/assets/pdf_file/0025/397402/Data-Dictionary-Vegetation-and-Heat-Mapping-Metro-Melbourne-2019-UPDATE.pdf
+  (linked from the metadata, but returns HTTP 403 as of 2026-10-19; a newer copy at
+  https://www.planning.vic.gov.au/__data/assets/pdf_file/0016/630124/data-dictionary-vegetation-and-heat-mapping-metro-melbourne.pdf
+  is also blocked)
+- Full metadata record: https://metashare.maps.vic.gov.au/geonetwork/srv/api/records/ea69bd5e-3682-5326-b1ec-8e2964baa6a0
 - Released: 2019-07-06 (last updated 2023-09-04)
 - Downloaded: 2026-10-17
 - Licence: Creative Commons Attribution 4.0 International (CC BY 4.0); the DataShare order also
@@ -107,17 +112,25 @@ Storage CRS for the database: GDA2020 (EPSG:7844).
   - `MB_CODE16`, `SA1_MAIN16`, `SA2_MAIN16`, `SA3_CODE16`, `SA4_CODE16`, `GCC_CODE16`, `LGA`:
     2016 geography codes and council name
 - Gotchas:
-  - Polygons are 2016 mesh blocks and do not nest inside 2021 SA2s. The 2016 codes cannot be
-    joined to 2021 codes, so aggregation to SA2 has to be spatial (overlay and area-weighting).
+  - Polygons are 2016 mesh blocks carrying 2016 SA2 codes, which cannot be joined to 2021 codes
+    (304 SA2s are new in 2021), so aggregation to SA2 has to be spatial. 55,591 of 55,603 mesh
+    blocks sit inside a single 2021 SA2; 12 cross an edge, 7 of them by 10% or more (all in
+    growth areas such as Melton South, Southbank and Pakenham). Area-weighting handles these
+    exactly; assigning by centre point is simpler and wrong only for those few.
   - The heat value is land surface temperature, not air temperature, from a single 2018 capture.
   - 273 polygons have a negative heat value (cooler than the baseline), probably water or large
     parks. Check before using them in the index.
-  - The metadata mentions vegetation "by modified Mesh Blocks as at 2014". TODO: confirm in the
-    data dictionary whether the vegetation is from 2014 or 2018.
+  - Vegetation year: most likely 2018. The sister dataset "Vegetation Cover for metropolitan
+    Melbourne 2018" says it comes from "aerial photography and Near-Infrared (NIR) imagery as at
+    2018", and this dataset is titled "Urban Vegetation 2018". Its own metadata mentions
+    "modified Mesh Blocks as at 2014", which probably refers to the boundaries, not the imagery.
+    The data dictionary that would confirm this is no longer online (HTTP 403 for both known
+    links). Sister dataset record:
+    https://metashare.maps.vic.gov.au/geonetwork/srv/api/records/88728f89-b1e1-5bba-9dce-04107c064fd2
   - Some outer Greater Melbourne SA2s have little or no data. The map needs a "no data" style.
 
 ## Raster or polygons?
 
-The heat data is polygons, each one a 2016 mesh block. Because the map uses 2021 SA2s and some
-2016 mesh blocks cross their edges, I have to combine them by overlapping their shapes and
-weighting by area, instead of matching them by SA2 code.
+The heat data is polygons, each one a 2016 mesh block. Because they use 2016 SA2 codes that
+don't match the 2021 SA2s (304 are new), I have to combine them by location on the map instead
+of by code; only a handful of mesh blocks (12 of 55,603) cross a 2021 SA2 edge.
