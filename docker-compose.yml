@@ -9,6 +9,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./db/init/20_schema.sql:/docker-entrypoint-initdb.d/20_schema.sql:ro
     healthcheck:
       # $$ stops Compose substituting these, so they are read inside the container
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
