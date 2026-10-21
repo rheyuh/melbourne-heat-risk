@@ -18,6 +18,11 @@ def get_engine():
     port = os.environ.get("POSTGRES_PORT", "5432")
     return create_engine(f"postgresql+psycopg://{user}:{password}@localhost:{port}/{db}")
 
+def reset_tables(engine):
+    with engine.begin() as conn:
+        query = "TRUNCATE sa2, seifa, heat_veg_raw, datasets"
+        conn.execute(text(query))
+
 def load_sa2(engine):
     gdf = gpd.read_file(
         SA2_FILE,
@@ -37,4 +42,5 @@ def load_sa2(engine):
 
 if __name__ == "__main__":
     engine = get_engine()
+    reset_tables(engine)
     load_sa2(engine)
