@@ -10,23 +10,15 @@ Run one check at a time from backend/:
 """
 
 import sys
-from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
-RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
-
-SA2_FILE = RAW_DATA_DIR / "abs_asgs_2021" / "ASGS_2021_Main_Structure_GDA2020.gpkg"
-SA2_LAYER = "SA2_2021_AUST_GDA2020"
-GREATER_MELBOURNE = "2GMEL"
-
-SEIFA_FILE = RAW_DATA_DIR / "abs_seifa_2021" / "Statistical Area Level 2, Indexes, SEIFA 2021.xlsx"
-
-HEAT_VEG_FILE = RAW_DATA_DIR / "vic_heat_vegetation_2018" / "ll_gda2020" / "filegdb" / "whole_of_dataset" / "victoria" / "PLANNING.gdb"
-HEAT_VEG_LAYER = "HEAT_URBAN_HEAT_2018"
+from config import (
+    SA2_FILE, SA2_LAYER, GREATER_MELBOURNE,
+    SEIFA_FILE, SEIFA_SHEET,
+    HEAT_VEG_FILE, HEAT_VEG_LAYER,
+)
 
 # Areas must be measured in metres, not degrees, so overlay work uses
 # GDA2020 / MGA zone 55 (EPSG:7855), the flat projection that covers Melbourne.
@@ -104,10 +96,10 @@ def inspect_seifa():
     print(f"sheets: {workbook.sheet_names}")
 
     print("\nTable 2, top rows as they are in the sheet:")
-    top_rows = pd.read_excel(SEIFA_FILE, sheet_name="Table 2", header=None, nrows=9)
+    top_rows = pd.read_excel(SEIFA_FILE, sheet_name=SEIFA_SHEET, header=None, nrows=9)
     print(top_rows.to_string())
 
-    table = pd.read_excel(SEIFA_FILE, sheet_name="Table 2", header=None, skiprows=6)
+    table = pd.read_excel(SEIFA_FILE, sheet_name=SEIFA_SHEET, header=None, skiprows=6)
     print(f"\nrows below the header: {len(table)}")
     print("last rows (first 4 columns):")
     print(table.tail(6).iloc[:, :4].to_string())

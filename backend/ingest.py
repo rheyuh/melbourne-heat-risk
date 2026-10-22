@@ -1,22 +1,14 @@
 import os
 from datetime import date
 from sqlalchemy import create_engine, text
-from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
-RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
-
-SA2_FILE = RAW_DATA_DIR / "abs_asgs_2021" / "ASGS_2021_Main_Structure_GDA2020.gpkg"
-SA2_LAYER = "SA2_2021_AUST_GDA2020"
-GREATER_MELBOURNE = "2GMEL"
-
-SEIFA_FILE = RAW_DATA_DIR / "abs_seifa_2021" / "Statistical Area Level 2, Indexes, SEIFA 2021.xlsx"
-
-HEAT_VEG_FILE = RAW_DATA_DIR / "vic_heat_vegetation_2018" / "ll_gda2020" / "filegdb" / "whole_of_dataset" / "victoria" / "PLANNING.gdb"
-HEAT_VEG_LAYER = "HEAT_URBAN_HEAT_2018"
+from config import (
+    SA2_FILE, SA2_LAYER, GREATER_MELBOURNE,
+    SEIFA_FILE, SEIFA_SHEET,
+    HEAT_VEG_FILE, HEAT_VEG_LAYER,
+)
 
 def get_engine():
     user = os.environ["POSTGRES_USER"]
@@ -50,7 +42,7 @@ def load_sa2(engine):
 def load_seifa(engine):
     df = pd.read_excel(
         SEIFA_FILE,
-        sheet_name="Table 2",
+        sheet_name=SEIFA_SHEET,
         header=None,
         skiprows=6,
         usecols="A,C,D,F,G,K,L",
