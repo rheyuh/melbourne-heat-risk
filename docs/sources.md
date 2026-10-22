@@ -3,6 +3,10 @@
 The raw files live in `data/raw/`, which is not committed. This file records where each one came
 from so the data can be downloaded again and cited.
 
+The SEIFA and heat facts below were checked with `backend/inspect_sources.py` (read-only; see the
+docstring for how to run each check). The SA2 facts were checked with `sqlite3` queries on the
+GeoPackage.
+
 Storage CRS for the database: GDA2020 (EPSG:7844).
 
 ## ASGS 2021 Main Structure (SA2 layer used)
