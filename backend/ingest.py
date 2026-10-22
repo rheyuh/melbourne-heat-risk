@@ -14,6 +14,9 @@ GREATER_MELBOURNE = "2GMEL"
 
 SEIFA_FILE = RAW_DATA_DIR / "abs_seifa_2021" / "Statistical Area Level 2, Indexes, SEIFA 2021.xlsx"
 
+HEAT_VEG_FILE = RAW_DATA_DIR / "vic_heat_vegetation_2018" / "ll_gda2020" / "filegdb" / "whole_of_dataset" / "victoria" / "PLANNING.gdb"
+HEAT_VEG_LAYER = "HEAT_URBAN_HEAT_2018"
+
 def get_engine():
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
@@ -23,7 +26,7 @@ def get_engine():
 
 def reset_tables(engine):
     with engine.begin() as conn:
-        query = "TRUNCATE sa2, seifa, heat_veg_raw, datasets"
+        query = "TRUNCATE sa2, seifa, mesh_block_heat_veg, datasets"
         conn.execute(text(query))
 
 def load_sa2(engine):
@@ -67,8 +70,29 @@ def load_seifa(engine):
     df.to_sql("seifa", engine, if_exists="append", index=False)
     print(f"seifa: {len(df)} rows")
 
+def load_mesh_block_heat_veg(engine):
+    gdf = gpd.read_file(
+        HEAT_VEG_FILE,
+        layer=HEAT_VEG_LAYER,
+        columns=["MB_CODE16", "LGA", "UHI18_M", "PERANYTREE", "PERTR03_10", "PERTR10_15", "PERTR15PL"],
+    )
+
+    gdf = gdf.rename(columns={
+        "MB_CODE16": "mb_code", 
+        "LGA": "lga", 
+        "UHI18_M": "uhi",
+        "PERANYTREE": "tree_pct",
+        "PERTR03_10": "tree_3_10_pct",
+        "PERTR10_15": "tree_10_15_pct",
+        "PERTR15PL": "tree_15_plus_pct"})
+    gdf = gdf.rename_geometry("geom")
+
+    gdf.to_postgis("mesh_block_heat_veg", engine, if_exists="append", index=False)
+    print(f"mesh_block_heat_veg: {len(gdf)} rows")
+
 if __name__ == "__main__":
     engine = get_engine()
     reset_tables(engine)
     load_sa2(engine)
     load_seifa(engine)
+    load_mesh_block_heat_veg(engine)

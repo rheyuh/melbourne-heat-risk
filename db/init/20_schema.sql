@@ -22,7 +22,7 @@ CREATE TABLE seifa (
     population          integer
 );
 
-CREATE TABLE heat_veg_raw (
+CREATE TABLE mesh_block_heat_veg (
     mb_code             text                            PRIMARY KEY,
     lga                 text,
     uhi                 double precision                NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE heat_veg_raw (
     geom                geometry(MultiPolygon, 7844)    NOT NULL
 );
 
-CREATE INDEX heat_veg_raw_geom_idx ON heat_veg_raw USING GIST (geom);
+CREATE INDEX mesh_block_heat_veg_geom_idx ON mesh_block_heat_veg USING GIST (geom);
 
 CREATE TABLE datasets (
     id                  text                            PRIMARY KEY,
