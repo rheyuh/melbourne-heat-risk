@@ -1,0 +1,16 @@
+[project]
+name = "backend"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "geoalchemy2>=0.20.0",
+    "geopandas>=1.2.0",
+    "openpyxl>=3.1.5",
+    "psycopg[binary]>=3.3.6",
+    "sqlalchemy>=2.1.5",
+]
+
+[dependency-groups]
+dev = [
+    "ipython>=9.17.1",
+]
