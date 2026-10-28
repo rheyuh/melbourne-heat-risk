@@ -19,7 +19,7 @@ def get_engine():
 
 def reset_tables(engine):
     with engine.begin() as conn:
-        query = "TRUNCATE sa2, seifa, mesh_block_heat_veg, datasets"
+        query = "TRUNCATE sa2, seifa, mesh_block_heat_veg, datasets, region_metrics"
         conn.execute(text(query))
 
 def load_sa2(engine):

@@ -44,3 +44,17 @@ CREATE TABLE datasets (
     released            date,
     loaded_at           timestamptz                     NOT NULL DEFAULT now()
 );
+
+CREATE TABLE region_metrics (
+    sa2_code            text                            PRIMARY KEY REFERENCES sa2 (sa2_code),
+    heat_uhi            double precision                NOT NULL,
+    canopy_pct          double precision                NOT NULL,
+    covered_fraction    double precision                NOT NULL,
+    heat_scaled         double precision,
+    canopy_scaled       double precision,
+    irsd_scaled         double precision,
+    risk_score          double precision,
+    heat_quintile       integer,
+    double_burden       boolean,
+    built_at            timestamptz                     NOT NULL DEFAULT now()
+);

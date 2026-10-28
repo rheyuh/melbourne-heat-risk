@@ -1,0 +1,8 @@
+# Analysis settings for building region_metrics (run by backend/build_metrics.py).
+
+[risk_weights]
+# Relative weights for the risk score. Each is divided by their total,
+# so 1, 1, 1 means one third each, and 2, 1, 1 means heat counts twice as much.
+heat = 1
+canopy = 1
+irsd = 1
