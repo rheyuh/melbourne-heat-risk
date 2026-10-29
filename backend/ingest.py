@@ -10,16 +10,16 @@ from config import (
     HEAT_VEG_FILE, HEAT_VEG_LAYER,
 )
 
-def get_engine():
+def get_engine(database=None):
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
-    db = os.environ["POSTGRES_DB"]
+    db = database or os.environ["POSTGRES_DB"]
     port = os.environ.get("POSTGRES_PORT", "5432")
     return create_engine(f"postgresql+psycopg://{user}:{password}@localhost:{port}/{db}")
 
 def reset_tables(engine):
     with engine.begin() as conn:
-        query = "TRUNCATE sa2, seifa, mesh_block_heat_veg, datasets"
+        query = "TRUNCATE sa2, seifa, mesh_block_heat_veg, datasets, region_metrics"
         conn.execute(text(query))
 
 def load_sa2(engine):
