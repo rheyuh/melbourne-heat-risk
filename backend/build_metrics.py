@@ -6,17 +6,19 @@ from ingest import get_engine
 
 BUILD_SQL = BACKEND_DIR / "sql" / "build_region_metrics.sql"
 
-def build_region_metrics(engine):
+def build_region_metrics(engine, weights=None):
+    if weights is None:
+        weights = RISK_WEIGHTS
     sql = text(BUILD_SQL.read_text())
-    weights = {
-        "w_heat": RISK_WEIGHTS["heat"],
-        "w_canopy": RISK_WEIGHTS["canopy"],
-        "w_irsd": RISK_WEIGHTS["irsd"],
+    params = {
+        "w_heat": weights["heat"],
+        "w_canopy": weights["canopy"],
+        "w_irsd": weights["irsd"],
     }
 
     with engine.begin() as conn:
         conn.execute(text("TRUNCATE region_metrics"))
-        result = conn.execute(sql, weights)
+        result = conn.execute(sql, params)
     print(f"region_metrics: {result.rowcount} rows")
 
 if __name__ == "__main__":

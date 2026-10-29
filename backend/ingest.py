@@ -10,10 +10,10 @@ from config import (
     HEAT_VEG_FILE, HEAT_VEG_LAYER,
 )
 
-def get_engine():
+def get_engine(database=None):
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
-    db = os.environ["POSTGRES_DB"]
+    db = database or os.environ["POSTGRES_DB"]
     port = os.environ.get("POSTGRES_PORT", "5432")
     return create_engine(f"postgresql+psycopg://{user}:{password}@localhost:{port}/{db}")
 
