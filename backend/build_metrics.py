@@ -2,7 +2,7 @@
 from sqlalchemy import text
 
 from config import BACKEND_DIR, RISK_WEIGHTS
-from ingest import get_engine
+from db import get_engine
 
 BUILD_SQL = BACKEND_DIR / "sql" / "build_region_metrics.sql"
 

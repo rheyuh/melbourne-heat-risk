@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import text
 
 from config import PROJECT_ROOT
-from ingest import get_engine
+from db import get_engine
 
 SCHEMA_SQL = PROJECT_ROOT / "db" / "init" / "20_schema.sql"
 TEST_DB = os.environ["POSTGRES_DB"] + "_test"
