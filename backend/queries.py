@@ -1,5 +1,4 @@
 """Data layer: SQL for the API. Takes a connection, returns plain Python data."""
-
 from sqlalchemy import text
 
 # Simplify to ~10 m (0.0001° at Melbourne latitude): shrinks /regions from 6.4 MB to ~775 kB.
@@ -36,6 +35,12 @@ DATASETS_SQL = text("""
     ORDER BY id
 """)
 
+REGION_AT_SQL = text("""
+    SELECT sa2_code
+    FROM sa2
+    WHERE ST_Contains(geom, ST_Transform(ST_SetSRID(ST_MakePoint(:lon, :lat), 4326), 7844))
+""")
+
 def ping(conn):
     conn.execute(text("SELECT 1"))
 
@@ -60,3 +65,6 @@ def fetch_datasets(conn):
     for row in result.mappings():
         datasets.append(dict(row))
     return datasets
+
+def find_region_at(conn, lat, lon):
+    return conn.execute(REGION_AT_SQL, {"lat": lat, "lon": lon}).scalar()
