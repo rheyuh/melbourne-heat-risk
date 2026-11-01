@@ -1,14 +1,14 @@
 """Web layer: routes, status codes and response formats."""
-
 import json
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy import Connection
 from sqlalchemy.exc import OperationalError
 
 import queries
 from db import get_engine
+from schemas import RegionDetail
 
 app = FastAPI(title="Melbourne Heat Risk Explorer API")
 engine = get_engine()
@@ -32,6 +32,14 @@ def list_regions(conn: Connection = Depends(get_conn)):
     for region in queries.fetch_regions(conn):
         features.append(to_feature(region))
     return {"type": "FeatureCollection", "features": features}
+
+@app.get("/regions/{sa2_code}", response_model=RegionDetail)
+def get_region(sa2_code: str, conn: Connection = Depends(get_conn)):
+    region = queries.fetch_region(conn, sa2_code)
+    if region is None:
+        raise HTTPException(status_code=404, detail=f"No SA2 with code {sa2_code}")
+    region["sources"] = queries.fetch_datasets(conn)
+    return region
 
 def to_feature(region):
     return {
