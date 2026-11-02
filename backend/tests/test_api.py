@@ -3,6 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 
 import api
 from build_metrics import build_region_metrics
@@ -164,3 +165,15 @@ def test_regions_csv_has_headers_and_every_region(client):
     lines = response.text.splitlines()
     assert lines[0] == ",".join(REGION_CSV_COLUMNS)
     assert len(lines) == 1 + 7
+
+
+def broken_conn():
+    raise OperationalError("SELECT 1", {}, Exception("connection refused"))
+
+
+@pytest.mark.parametrize("path", ["/health", "/regions", "/regions/S1", "/hotspots"])
+def test_database_down_is_503(client, path):
+    api.app.dependency_overrides[api.get_conn] = broken_conn
+    response = client.get(path)
+    assert response.status_code == 503
+    assert response.json() == {"detail": "database unreachable"}
