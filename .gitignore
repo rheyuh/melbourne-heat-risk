@@ -19,4 +19,5 @@ dist/
 .idea/
 .vscode/
 
-data/
+# Downloaded source data (large, re-downloadable)
+/data/

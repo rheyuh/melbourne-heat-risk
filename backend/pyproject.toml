@@ -3,6 +3,7 @@ name = "backend"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "fastapi[standard]>=0.162.0",
     "geoalchemy2>=0.20.0",
     "geopandas>=1.2.0",
     "openpyxl>=3.1.5",
