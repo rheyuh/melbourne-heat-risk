@@ -41,6 +41,18 @@ REGION_AT_SQL = text("""
     WHERE ST_Contains(geom, ST_Transform(ST_SetSRID(ST_MakePoint(:lon, :lat), 4326), 7844))
 """)
 
+HOTSPOTS_SQL = text("""
+    SELECT  s.sa2_code, s.sa2_name,
+            m.risk_score, m.double_burden,
+            m.heat_uhi, m.canopy_pct, se.vic_decile
+    FROM region_metrics m
+    JOIN sa2 s USING (sa2_code)
+    LEFT JOIN seifa se USING (sa2_code)
+    WHERE m.risk_score IS NOT NULL
+    ORDER BY m.risk_score DESC, s.sa2_code
+    LIMIT :top
+""")
+
 def ping(conn):
     conn.execute(text("SELECT 1"))
 
@@ -68,3 +80,10 @@ def fetch_datasets(conn):
 
 def find_region_at(conn, lat, lon):
     return conn.execute(REGION_AT_SQL, {"lat": lat, "lon": lon}).scalar()
+
+def fetch_hotspots(conn, top):
+    result = conn.execute(HOTSPOTS_SQL, {"top": top})
+    hotspots = []
+    for row in result.mappings():
+        hotspots.append(dict(row))
+    return hotspots
