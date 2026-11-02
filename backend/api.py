@@ -40,7 +40,7 @@ def download_regions_csv(conn: Connection = Depends(get_conn)):
 def list_regions(conn: Connection = Depends(get_conn)):
     features = []
     for region in queries.fetch_regions(conn):
-        features.append(to_feature(region))
+        features.append(formats.to_feature(region))
     return {"type": "FeatureCollection", "features": features}
 
 @app.get("/regions/at", response_model=RegionDetail)
@@ -77,16 +77,3 @@ def list_hotspots(
 @app.get("/datasets", response_model=list[Dataset])
 def list_datasets(conn: Connection = Depends(get_conn)):
     return queries.fetch_datasets(conn)
-
-def to_feature(region):
-    return {
-        "type": "Feature",
-        "id": region["sa2_code"],
-        "geometry": json.loads(region["geometry"]),
-        "properties": {
-            "sa2_code": region["sa2_code"],
-            "sa2_name": region["sa2_name"],
-            "risk_score": region["risk_score"],
-            "double_burden": region["double_burden"],
-        },
-    }
