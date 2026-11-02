@@ -42,3 +42,28 @@ def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "database": "reachable"}
+
+
+def test_regions_is_a_feature_collection_of_every_sa2(client):
+    response = client.get("/regions")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["type"] == "FeatureCollection"
+
+    codes = []
+    for feature in body["features"]:
+        codes.append(feature["id"])
+        assert feature["type"] == "Feature"
+        assert feature["geometry"]["type"] in ("Polygon", "MultiPolygon")
+        assert "crs" not in feature["geometry"]
+    assert codes == ["S1", "S2", "S3", "S4", "S5", "S6", "S7"]
+
+
+def test_regions_without_scores_are_null_not_missing(client):
+    properties = {}
+    for feature in client.get("/regions").json()["features"]:
+        properties[feature["id"]] = feature["properties"]
+
+    assert properties["S5"]["double_burden"] is True
+    assert properties["S6"]["risk_score"] is None
+    assert properties["S7"]["risk_score"] is None
