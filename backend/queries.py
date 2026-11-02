@@ -29,6 +29,20 @@ REGION_SQL = text("""
     WHERE s.sa2_code = :sa2_code
 """)
 
+REGION_DETAIL_SELECT = """
+    SELECT  s.sa2_code, s.sa2_name, s.area_sqkm,
+            m.heat_uhi, m.canopy_pct, m.covered_fraction,
+            m.heat_scaled, m.canopy_scaled, m.irsd_scaled,
+            m.risk_score, m.heat_quintile, m.double_burden,
+            se.irsd_score, se.vic_decile, se.population
+    FROM sa2 s
+    LEFT JOIN region_metrics m USING (sa2_code)
+    LEFT JOIN seifa se USING (sa2_code)
+"""
+
+REGION_SQL = text(REGION_DETAIL_SELECT + "WHERE s.sa2_code = :sa2_code")
+ALL_REGION_DETAILS_SQL = text(REGION_DETAIL_SELECT + "ORDER BY s.sa2_code")
+
 DATASETS_SQL = text("""
     SELECT id, title, publisher, licence, source_url
     FROM datasets
@@ -70,6 +84,13 @@ def fetch_region(conn, sa2_code):
     if row is None:
         return None
     return dict(row)
+
+def fetch_all_region_details(conn):
+    result = conn.execute(ALL_REGION_DETAILS_SQL)
+    regions = []
+    for row in result.mappings():
+        regions.append(dict(row))
+    return regions
 
 def fetch_datasets(conn):
     result = conn.execute(DATASETS_SQL)
