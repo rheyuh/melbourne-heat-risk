@@ -1,8 +1,8 @@
 """Web layer: routes, status codes and response formats."""
-import json
+import json, io, csv
 
 from fastapi import Depends, FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy import Connection
 from sqlalchemy.exc import OperationalError
 
@@ -25,6 +25,21 @@ async def database_unavailable(request, exc):
 def health(conn: Connection = Depends(get_conn)):
     queries.ping(conn)
     return {"status": "ok", "database": "reachable"}
+
+@app.get("/regions.csv")
+def download_regions_csv(conn: Connection = Depends(get_conn)):
+    regions = queries.fetch_all_region_details(conn)
+
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=list(regions[0].keys()))
+    writer.writeheader()
+    writer.writerows(regions)
+
+    return Response(
+        content=buffer.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="regions.csv"'},
+    )
 
 @app.get("/regions")
 def list_regions(conn: Connection = Depends(get_conn)):
