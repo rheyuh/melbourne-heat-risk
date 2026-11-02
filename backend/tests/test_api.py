@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 import api
 from build_metrics import build_region_metrics
+from schemas import REGION_CSV_COLUMNS
 
 EQUAL_WEIGHTS = {"heat": 1 / 3, "canopy": 1 / 3, "irsd": 1 / 3}
 
@@ -116,3 +117,50 @@ def test_point_outside_map_is_404(client):
 ])
 def test_point_lookup_rejects_bad_coordinates(client, params):
     assert client.get("/regions/at", params=params).status_code == 422
+
+
+def test_hotspots_are_ranked_by_risk(client):
+    response = client.get("/hotspots")
+    assert response.status_code == 200
+
+    codes = []
+    ranks = []
+    for hotspot in response.json():
+        codes.append(hotspot["sa2_code"])
+        ranks.append(hotspot["rank"])
+    # S6 has no score and S7 has no metrics row, so neither can be ranked.
+    assert codes == ["S3", "S5", "S1", "S4", "S2"]
+    assert ranks == [1, 2, 3, 4, 5]
+
+
+def test_hotspots_top_limits_the_list(client):
+    response = client.get("/hotspots", params={"top": 2})
+    codes = []
+    for hotspot in response.json():
+        codes.append(hotspot["sa2_code"])
+    assert codes == ["S3", "S5"]
+
+
+@pytest.mark.parametrize("top", [0, 101, "abc"], ids=["zero", "over 100", "not a number"])
+def test_hotspots_rejects_bad_top(client, top):
+    assert client.get("/hotspots", params={"top": top}).status_code == 422
+
+
+def test_datasets_lists_sources(client):
+    response = client.get("/datasets")
+    assert response.status_code == 200
+    ids = []
+    for dataset in response.json():
+        ids.append(dataset["id"])
+    assert ids == ["test_sa2", "test_seifa"]
+
+
+def test_regions_csv_has_headers_and_every_region(client):
+    response = client.get("/regions.csv")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/csv")
+    assert "attachment" in response.headers["content-disposition"]
+
+    lines = response.text.splitlines()
+    assert lines[0] == ",".join(REGION_CSV_COLUMNS)
+    assert len(lines) == 1 + 7
