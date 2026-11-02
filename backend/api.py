@@ -1,7 +1,7 @@
 """Web layer: routes, status codes and response formats."""
 import json
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy import Connection
 from sqlalchemy.exc import OperationalError
@@ -32,6 +32,19 @@ def list_regions(conn: Connection = Depends(get_conn)):
     for region in queries.fetch_regions(conn):
         features.append(to_feature(region))
     return {"type": "FeatureCollection", "features": features}
+
+@app.get("/regions/at", response_model=RegionDetail)
+def get_region_at(
+    lat: float = Query(ge=-90, le=90),
+    lon: float = Query(ge=-180, le=180),
+    conn: Connection = Depends(get_conn),
+):
+    sa2_code = queries.find_region_at(conn, lat, lon)
+    if sa2_code is None:
+        raise HTTPException(status_code=404, detail="No Greater Melbourne SA2 contains this point")
+    region = queries.fetch_region(conn, sa2_code)
+    region["sources"] = queries.fetch_datasets(conn)
+    return region
 
 @app.get("/regions/{sa2_code}", response_model=RegionDetail)
 def get_region(sa2_code: str, conn: Connection = Depends(get_conn)):
