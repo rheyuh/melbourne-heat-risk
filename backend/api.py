@@ -17,6 +17,11 @@ def get_conn():
     with engine.connect() as conn:
         yield conn
 
+CSV_COLUMNS = []
+for name in RegionDetail.model_fields:
+    if name != "sources":
+        CSV_COLUMNS.append(name)
+
 @app.exception_handler(OperationalError)
 async def database_unavailable(request, exc):
     return JSONResponse(status_code=503, content={"detail": "database unreachable"})
@@ -31,7 +36,7 @@ def download_regions_csv(conn: Connection = Depends(get_conn)):
     regions = queries.fetch_all_region_details(conn)
 
     buffer = io.StringIO()
-    writer = csv.DictWriter(buffer, fieldnames=list(regions[0].keys()))
+    writer = csv.DictWriter(buffer, fieldnames=CSV_COLUMNS, extrasaction="ignore")
     writer.writeheader()
     writer.writerows(regions)
 
