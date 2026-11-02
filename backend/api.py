@@ -1,5 +1,5 @@
 """Web layer: routes, status codes and response formats."""
-import json, io, csv
+import json
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
@@ -7,6 +7,7 @@ from sqlalchemy import Connection
 from sqlalchemy.exc import OperationalError
 
 import queries
+import formats
 from db import get_engine
 from schemas import Dataset, RegionDetail, Hotspot
 
@@ -34,14 +35,8 @@ def health(conn: Connection = Depends(get_conn)):
 @app.get("/regions.csv")
 def download_regions_csv(conn: Connection = Depends(get_conn)):
     regions = queries.fetch_all_region_details(conn)
-
-    buffer = io.StringIO()
-    writer = csv.DictWriter(buffer, fieldnames=CSV_COLUMNS, extrasaction="ignore")
-    writer.writeheader()
-    writer.writerows(regions)
-
     return Response(
-        content=buffer.getvalue(),
+        content=formats.to_csv(regions, CSV_COLUMNS),
         media_type="text/csv",
         headers={"Content-Disposition": 'attachment; filename="regions.csv"'},
     )
