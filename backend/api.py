@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 
 import queries
 from db import get_engine
-from schemas import RegionDetail, Hotspot
+from schemas import Dataset, RegionDetail, Hotspot
 
 app = FastAPI(title="Melbourne Heat Risk Explorer API")
 engine = get_engine()
@@ -63,6 +63,10 @@ def list_hotspots(
     for rank, hotspot in enumerate(hotspots, start=1):
         hotspot["rank"] = rank
     return hotspots
+
+@app.get("/datasets", response_model=list[Dataset])
+def list_datasets(conn: Connection = Depends(get_conn)):
+    return queries.fetch_datasets(conn)
 
 def to_feature(region):
     return {
