@@ -25,3 +25,13 @@ class RegionDetail(BaseModel):
     vic_decile: int | None
     population: int | None
     sources: list[Dataset]
+
+class Hotspot(BaseModel):
+    rank: int
+    sa2_code: str
+    sa2_name: str
+    risk_score: float
+    double_burden: bool | None
+    heat_uhi: float
+    canopy_pct: float
+    vic_decile: int | None
