@@ -67,3 +67,52 @@ def test_regions_without_scores_are_null_not_missing(client):
     assert properties["S5"]["double_burden"] is True
     assert properties["S6"]["risk_score"] is None
     assert properties["S7"]["risk_score"] is None
+
+
+def test_region_detail_has_metrics_and_sources(client):
+    response = client.get("/regions/S5")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["sa2_code"] == "S5"
+    assert body["risk_score"] == pytest.approx(41 / 54, abs=1e-3)
+    assert body["double_burden"] is True
+
+    source_ids = []
+    for source in body["sources"]:
+        source_ids.append(source["id"])
+    assert source_ids == ["test_sa2", "test_seifa"]
+
+
+def test_region_detail_without_metrics_row(client):
+    response = client.get("/regions/S7")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["heat_uhi"] is None
+    assert body["risk_score"] is None
+    assert body["vic_decile"] == 8
+
+
+def test_unknown_region_is_404(client):
+    assert client.get("/regions/nope").status_code == 404
+
+
+def test_point_lookup_finds_containing_region(client):
+    # The middle of S3, which spans units 4 to 5: longitude 145.045, halfway between SOUTH and NORTH.
+    response = client.get("/regions/at", params={"lat": -37.805, "lon": 145.045})
+    assert response.status_code == 200
+    assert response.json()["sa2_code"] == "S3"
+
+
+def test_point_outside_map_is_404(client):
+    response = client.get("/regions/at", params={"lat": -33.8688, "lon": 151.2093})
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize("params", [
+    {"lat": 500, "lon": 145.0},
+    {"lat": -37.8, "lon": 999},
+    {"lat": "abc", "lon": 145.0},
+    {"lon": 145.0},
+])
+def test_point_lookup_rejects_bad_coordinates(client, params):
+    assert client.get("/regions/at", params=params).status_code == 422
