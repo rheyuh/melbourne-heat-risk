@@ -35,3 +35,9 @@ class Hotspot(BaseModel):
     heat_uhi: float
     canopy_pct: float
     vic_decile: int | None
+
+# Columns for /regions.csv: every RegionDetail field except the nested sources list.
+REGION_CSV_COLUMNS = []
+for name in RegionDetail.model_fields:
+    if name != "sources":
+        REGION_CSV_COLUMNS.append(name)

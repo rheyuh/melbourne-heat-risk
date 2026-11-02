@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError
 import queries
 import formats
 from db import get_engine
-from schemas import Dataset, RegionDetail, Hotspot
+from schemas import Dataset, RegionDetail, Hotspot, REGION_CSV_COLUMNS
 
 app = FastAPI(title="Melbourne Heat Risk Explorer API")
 engine = get_engine()
@@ -17,11 +17,6 @@ engine = get_engine()
 def get_conn():
     with engine.connect() as conn:
         yield conn
-
-CSV_COLUMNS = []
-for name in RegionDetail.model_fields:
-    if name != "sources":
-        CSV_COLUMNS.append(name)
 
 @app.exception_handler(OperationalError)
 async def database_unavailable(request, exc):
@@ -36,7 +31,7 @@ def health(conn: Connection = Depends(get_conn)):
 def download_regions_csv(conn: Connection = Depends(get_conn)):
     regions = queries.fetch_all_region_details(conn)
     return Response(
-        content=formats.to_csv(regions, CSV_COLUMNS),
+        content=formats.to_csv(regions, REGION_CSV_COLUMNS),
         media_type="text/csv",
         headers={"Content-Disposition": 'attachment; filename="regions.csv"'},
     )
