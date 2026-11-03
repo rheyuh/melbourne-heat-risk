@@ -17,3 +17,21 @@ export function quintileBreaks(values: (number | null)[]): number[] {
   }
   return breaks
 }
+
+// ColorBrewer YlOrRd, 5 classes: lightest = lowest heat risk, darkest = highest
+export const YLORRD = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"]
+export const NO_DATA = "#cccccc"
+
+// Which of the five classes (0–4) a value falls in, given four breaks.
+// A value equal to a break goes in the class above it.
+export function classIndex(value: number, breaks: number[]): number {
+  let i = 0
+  while (i < breaks.length && value >= breaks[i]) i++
+  return i
+}
+
+// Fill colour for one region: grey when there's no data, otherwise its class's colour
+export function colourFor(value: number | null, breaks: number[]): string {
+  if (value === null) return NO_DATA
+  return YLORRD[classIndex(value, breaks)]
+}
