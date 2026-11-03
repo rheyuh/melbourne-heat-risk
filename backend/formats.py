@@ -32,5 +32,8 @@ def to_feature(region):
             "sa2_name": region["sa2_name"],
             "risk_score": region["risk_score"],
             "double_burden": region["double_burden"],
+            "heat_uhi": region["heat_uhi"],
+            "canopy_pct": region["canopy_pct"],
+            "vic_decile": region["vic_decile"],
         },
     }
