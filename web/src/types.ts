@@ -47,6 +47,9 @@ export interface RegionProperties {
   sa2_name: string
   risk_score: number | null
   double_burden: boolean | null
+  heat_uhi: number | null
+  canopy_pct: number | null
+  vic_decile: number | null
 }
 
 export type RegionCollection = FeatureCollection<Polygon | MultiPolygon, RegionProperties>
