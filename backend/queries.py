@@ -11,22 +11,14 @@ REGIONS_SQL = text("""
             s.sa2_name,
             m.risk_score,
             m.double_burden,
+            m.heat_uhi,
+            m.canopy_pct,
+            se.vic_decile,
             ST_AsGeoJSON(ST_Transform(ST_SimplifyPreserveTopology(s.geom, :tolerance), 4326), :decimals) AS geometry
     FROM sa2 s
     LEFT JOIN region_metrics m USING (sa2_code)
-    ORDER BY s.sa2_code
-""")
-
-REGION_SQL = text("""
-    SELECT  s.sa2_code, s.sa2_name, s.area_sqkm,
-            m.heat_uhi, m.canopy_pct, m.covered_fraction,
-            m.heat_scaled, m.canopy_scaled, m.irsd_scaled,
-            m.risk_score, m.heat_quintile, m.double_burden,
-            se.irsd_score, se.vic_decile, se.population
-    FROM sa2 s
-    LEFT JOIN region_metrics m USING (sa2_code)
     LEFT JOIN seifa se USING (sa2_code)
-    WHERE s.sa2_code = :sa2_code
+    ORDER BY s.sa2_code
 """)
 
 REGION_DETAIL_SELECT = """
