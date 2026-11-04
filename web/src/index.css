@@ -115,6 +115,14 @@ body,
   cursor: pointer;
 }
 
+.card-error {
+  color: #bd0026;
+}
+
+.card-loading {
+  color: #666;
+}
+
 .swatch-outline {
   background: transparent;
   border: 2.5px solid #1f4e9c;

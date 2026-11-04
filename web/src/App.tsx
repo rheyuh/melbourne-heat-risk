@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { GeoJSON, MapContainer, TileLayer, ZoomControl } from "react-leaflet"
 import type { LatLngExpression, PathOptions } from "leaflet"
 import type { Feature, Geometry } from "geojson"
-import { fetchRegions } from "./api"
+import { fetchRegion, fetchRegions } from "./api"
 import { LAYERS, LAYER_INFO, type Layer } from "./layers"
 import { NO_DATA, YLORRD, classLabels, colourFor, quintileBreaks } from "./scale"
-import type { RegionCollection, RegionProperties } from "./types"
+import type { RegionCollection, RegionDetail, RegionProperties } from "./types"
 
 const MELBOURNE: LatLngExpression = [-37.8136, 144.9631]
 const DOUBLE_BURDEN_COLOUR = "#1f4e9c"
@@ -21,6 +21,31 @@ function App() {
       .then(setRegions)
       .catch((err: unknown) => setError(err instanceof Error ? err.message : String(err)))
   }, [])
+
+  const [detail, setDetail] = useState<RegionDetail | null>(null)
+  const [detailError, setDetailError] = useState<{ code: string; message: string } | null>(null)
+
+  // Load the selected region's details whenever the selection changes
+  useEffect(() => {
+    if (selectedCode === null) return
+    let ignore = false
+    fetchRegion(selectedCode)
+      .then((d) => {
+        if (!ignore) setDetail(d)
+      })
+      .catch((err: unknown) => {
+        if (!ignore) {
+          setDetailError({ code: selectedCode, message: err instanceof Error ? err.message : String(err) })
+        }
+      })
+    return () => {
+      ignore = true
+    }
+  }, [selectedCode])
+
+  // Only show results for the region that's selected now, not an earlier one
+  const shownDetail = detail?.sa2_code === selectedCode ? detail : null
+  const shownError = detailError?.code === selectedCode ? detailError.message : null
 
   const info = LAYER_INFO[layer]
   const breaks = 
@@ -56,7 +81,9 @@ function App() {
           <button className="close" onClick={() => setSelectedCode(null)} aria-label="Close details">
             ✕
           </button>
-          <h2>{selectedCode}</h2>
+          <h2>{shownDetail ? shownDetail.sa2_name : selectedCode}</h2>
+          {shownError && <p className="card-error">Couldn't load details: {shownError}</p>}
+          {!shownDetail && !shownError && <p className="card-loading">Loading…</p>}
         </aside>
       )}
       <div className="panel">
