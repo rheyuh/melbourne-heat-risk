@@ -123,6 +123,64 @@ body,
   color: #666;
 }
 
+.rank {
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.badge {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 2px 6px;
+  border: 2px solid #1f4e9c;
+  border-radius: 3px;
+  color: #1f4e9c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metrics {
+  margin: 8px 0;
+}
+
+.metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.metrics dt {
+  color: #555;
+}
+
+.metrics dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.region-card h3 {
+  font-size: 14px;
+  margin: 12px 0 4px;
+}
+
+.sources {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.sources li {
+  margin-bottom: 4px;
+}
+
+.source-meta {
+  display: block;
+  color: #666;
+  font-size: 12px;
+}
+
 .swatch-outline {
   background: transparent;
   border: 2.5px solid #1f4e9c;

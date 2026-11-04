@@ -4,6 +4,7 @@ import type { LatLngExpression, PathOptions } from "leaflet"
 import type { Feature, Geometry } from "geojson"
 import { fetchRegion, fetchRegions } from "./api"
 import { LAYERS, LAYER_INFO, type Layer } from "./layers"
+import { RegionDetails } from "./RegionDetails"
 import { NO_DATA, YLORRD, classLabels, colourFor, quintileBreaks } from "./scale"
 import type { RegionCollection, RegionDetail, RegionProperties } from "./types"
 
@@ -84,6 +85,7 @@ function App() {
           <h2>{shownDetail ? shownDetail.sa2_name : selectedCode}</h2>
           {shownError && <p className="card-error">Couldn't load details: {shownError}</p>}
           {!shownDetail && !shownError && <p className="card-loading">Loading…</p>}
+          {shownDetail && <RegionDetails detail={shownDetail} />}
         </aside>
       )}
       <div className="panel">
