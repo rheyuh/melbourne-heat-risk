@@ -21,6 +21,8 @@ export interface RegionDetail {
   canopy_scaled: number | null
   irsd_scaled: number | null
   risk_score: number | null
+  risk_rank: number | null       // 1 = highest risk; null when unscored
+  ranked_count: number | null    // the "of N"
   heat_quintile: number | null
   double_burden: boolean | null
   irsd_score: number | null
