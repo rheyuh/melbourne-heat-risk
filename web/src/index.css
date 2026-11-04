@@ -1,0 +1,230 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.map {
+  height: 100%;
+}
+
+.error {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #bd0026;
+  padding: 8px 12px;
+}
+
+.panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+.panel fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.panel legend {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.panel label {
+  display: block;
+  cursor: pointer;
+}
+
+.legend {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.legend-title {
+  font-weight: 600;
+}
+
+.legend-note {
+  max-width: 220px;
+  font-size: 12px;
+  margin: 2px 0 4px;
+}
+
+.legend-hint {
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border: 1px solid #999;
+  opacity: 0.7;
+}
+
+.region-card {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  width: 300px;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+.region-card h2 {
+  font-size: 16px;
+  margin: 0 24px 8px 0;
+}
+
+.region-card .close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 0;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.card-error {
+  color: #bd0026;
+}
+
+.card-loading {
+  color: #666;
+}
+
+.rank {
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.badge {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 2px 6px;
+  border: 2px solid #1f4e9c;
+  border-radius: 3px;
+  color: #1f4e9c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metrics {
+  margin: 8px 0;
+}
+
+.metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.metrics dt {
+  color: #555;
+}
+
+.metrics dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.region-card h3 {
+  font-size: 14px;
+  margin: 12px 0 4px;
+}
+
+.sources {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.sources li {
+  margin-bottom: 4px;
+}
+
+.source-meta {
+  display: block;
+  color: #666;
+  font-size: 12px;
+}
+
+.hotspots {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.hotspots li {
+  margin: 2px 0;
+}
+
+.hotspots button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hotspots button:hover {
+  text-decoration: underline;
+}
+
+.hotspot-score {
+  color: #bd0026;
+  font-weight: 600;
+}
+
+.download {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #1f4e9c;
+  color: #fff;
+  text-decoration: none;
+}
+
+.toggle {
+  display: block;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+  cursor: pointer;
+}

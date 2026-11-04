@@ -9,6 +9,9 @@ REGION = {
     "sa2_name": "Test region",
     "risk_score": None,
     "double_burden": None,
+    "heat_uhi": None,
+    "canopy_pct": None,
+    "vic_decile": None,
     "geometry": '{"type":"Polygon","coordinates":[[[145.0,-37.81],[145.01,-37.81],[145.01,-37.8],[145.0,-37.8],[145.0,-37.81]]]}',
 }
 
@@ -19,6 +22,8 @@ def test_to_feature_parses_geometry_and_keeps_nulls():
     assert feature["id"] == "S1"
     assert feature["geometry"]["type"] == "Polygon"
     assert feature["properties"]["risk_score"] is None
+    assert feature["properties"]["canopy_pct"] is None
+    assert feature["properties"]["vic_decile"] is None
 
 
 @pytest.mark.parametrize("value, expected", [
