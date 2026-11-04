@@ -1,3 +1,13 @@
+x-backend: &backend
+  build: ./backend
+  environment:
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    POSTGRES_DB: ${POSTGRES_DB}
+    # Inside Compose the db is reached by service name on its internal port
+    POSTGRES_HOST: db
+    POSTGRES_PORT: "5432"
+
 services:
   db:
     image: imresamu/postgis:17-3.5
@@ -16,6 +26,23 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  seed:
+    <<: *backend
+    command: sh -c "python ingest.py && python build_metrics.py"
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
 
 volumes:
   db_data:
