@@ -4,7 +4,7 @@ import type { LatLngExpression, PathOptions } from "leaflet"
 import type { Feature, Geometry } from "geojson"
 import { fetchRegions } from "./api"
 import { LAYERS, LAYER_INFO, type Layer } from "./layers"
-import { colourFor, quintileBreaks } from "./scale"
+import { NO_DATA, YLORRD, classLabels, colourFor, quintileBreaks } from "./scale"
 import type { RegionCollection, RegionProperties } from "./types"
 
 const MELBOURNE: LatLngExpression = [-37.8136, 144.9631]
@@ -35,6 +35,12 @@ function App() {
     }
   }
 
+  // Legend rows, darkest (most heat risk) first
+  const labels = info.fixedLabels ?? (breaks.length > 0 ? classLabels(breaks, info.format) : [])
+  const legend = labels
+    .map((text, i) => ({ text, colourIndex: info.reversed ? YLORRD.length - 1 - i : i }))
+    .sort((a, b) => b.colourIndex - a.colourIndex)
+
   return (
     <>
       {error && <div className="error">Couldn't load regions: {error}</div>}
@@ -54,6 +60,22 @@ function App() {
             </label>
           ))}
         </fieldset>
+        {legend.length > 0 && (
+          <div className="legend">
+            <div className="legend-title">{info.label}</div>
+            <div className="legend-hint">Deep red indicates more heat risk</div>
+            {legend.map((row) => (
+              <div key={row.text} className="legend-row">
+                <span className="swatch" style={{ background: YLORRD[row.colourIndex] }} />
+                {row.text}
+              </div>
+            ))}
+            <div className="legend-row">
+              <span className="swatch" style={{ background: NO_DATA }} />
+              No data
+            </div>
+          </div>
+        )}
       </div>
       <MapContainer center={MELBOURNE} zoom={11} className="map">
         <TileLayer
