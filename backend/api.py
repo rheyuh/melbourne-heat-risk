@@ -1,15 +1,14 @@
 """Web layer: routes, status codes and response formats."""
-import json
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy import Connection
 from sqlalchemy.exc import OperationalError
 
-import queries
 import formats
+import queries
 from db import get_engine
-from schemas import Dataset, RegionDetail, Hotspot, REGION_CSV_COLUMNS
+from schemas import REGION_CSV_COLUMNS, Dataset, Hotspot, RegionDetail
 
 app = FastAPI(title="Melbourne Heat Risk Explorer API")
 engine = get_engine()

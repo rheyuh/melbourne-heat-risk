@@ -1,6 +1,7 @@
 """Response shapes for the API. Knows fields and types, not SQL or HTTP."""
 from pydantic import BaseModel
 
+
 class Dataset(BaseModel):
     id: str
     title: str
