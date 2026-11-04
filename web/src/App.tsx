@@ -8,6 +8,7 @@ import { NO_DATA, YLORRD, classLabels, colourFor, quintileBreaks } from "./scale
 import type { RegionCollection, RegionProperties } from "./types"
 
 const MELBOURNE: LatLngExpression = [-37.8136, 144.9631]
+const DOUBLE_BURDEN_COLOUR = "#1f4e9c"
 
 function App() {
   const [regions, setRegions] = useState<RegionCollection | null>(null)
@@ -40,6 +41,11 @@ function App() {
   const legend = labels
     .map((text, i) => ({ text, colourIndex: info.reversed ? YLORRD.length - 1 - i : i }))
     .sort((a, b) => b.colourIndex - a.colourIndex)
+
+  // Only the regions flagged as double burden, for the outline layer
+  const doubleBurden: RegionCollection | null = regions
+    ? { ...regions, features: regions.features.filter((f) => f.properties.double_burden === true) }
+    : null
 
   return (
     <>
@@ -75,6 +81,10 @@ function App() {
               <span className="swatch" style={{ background: NO_DATA }} />
               No data
             </div>
+            <div className="legend-row">
+              <span className="swatch swatch-outline" />
+              Double burden
+            </div>
           </div>
         )}
       </div>
@@ -85,6 +95,13 @@ function App() {
         />
         {regions && (
           <GeoJSON data={regions} style={styleRegion} />
+        )}
+        {doubleBurden && (
+          <GeoJSON
+            data={doubleBurden}
+            style={{ color: DOUBLE_BURDEN_COLOUR, weight: 2.5, fill: false }}
+            interactive={false}
+          />
         )}
       </MapContainer>
     </>
