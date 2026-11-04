@@ -2,11 +2,12 @@ import { useEffect, useState } from "react"
 import { GeoJSON, MapContainer, TileLayer, ZoomControl } from "react-leaflet"
 import type { LatLngExpression, PathOptions } from "leaflet"
 import type { Feature, Geometry } from "geojson"
-import { fetchRegion, fetchRegions } from "./api"
+import { fetchHotspots, fetchRegion, fetchRegions } from "./api"
+import { HotspotList } from "./HotspotList"
 import { LAYERS, LAYER_INFO, type Layer } from "./layers"
 import { RegionDetails } from "./RegionDetails"
 import { NO_DATA, YLORRD, classLabels, colourFor, quintileBreaks } from "./scale"
-import type { RegionCollection, RegionDetail, RegionProperties } from "./types"
+import type { Hotspot, RegionCollection, RegionDetail, RegionProperties } from "./types"
 
 const MELBOURNE: LatLngExpression = [-37.8136, 144.9631]
 const DOUBLE_BURDEN_COLOUR = "#1f4e9c"
@@ -21,6 +22,15 @@ function App() {
     fetchRegions()
       .then(setRegions)
       .catch((err: unknown) => setError(err instanceof Error ? err.message : String(err)))
+  }, [])
+
+  const [hotspots, setHotspots] = useState<Hotspot[] | null>(null)
+  const [hotspotsError, setHotspotsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchHotspots(10)
+      .then(setHotspots)
+      .catch((err: unknown) => setHotspotsError(err instanceof Error ? err.message : String(err)))
   }, [])
 
   const [detail, setDetail] = useState<RegionDetail | null>(null)
@@ -77,17 +87,21 @@ function App() {
   return (
     <>
       {error && <div className="error">Couldn't load regions: {error}</div>}
-      {selectedCode && (
-        <aside className="region-card">
-          <button className="close" onClick={() => setSelectedCode(null)} aria-label="Close details">
-            ✕
-          </button>
-          <h2>{shownDetail ? shownDetail.sa2_name : selectedCode}</h2>
-          {shownError && <p className="card-error">Couldn't load details: {shownError}</p>}
-          {!shownDetail && !shownError && <p className="card-loading">Loading…</p>}
-          {shownDetail && <RegionDetails detail={shownDetail} />}
-        </aside>
-      )}
+      <aside className="region-card">
+        {selectedCode ? (
+          <>
+            <button className="close" onClick={() => setSelectedCode(null)} aria-label="Back to hotspots">
+              ✕
+            </button>
+            <h2>{shownDetail ? shownDetail.sa2_name : selectedCode}</h2>
+            {shownError && <p className="card-error">Couldn't load details: {shownError}</p>}
+            {!shownDetail && !shownError && <p className="card-loading">Loading…</p>}
+            {shownDetail && <RegionDetails detail={shownDetail} />}
+          </>
+        ) : (
+          <HotspotList hotspots={hotspots} error={hotspotsError} onSelect={setSelectedCode} />
+        )}
+      </aside>
       <div className="panel">
         <fieldset>
           <legend>Show</legend>

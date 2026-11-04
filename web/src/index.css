@@ -181,6 +181,46 @@ body,
   font-size: 12px;
 }
 
+.hotspots {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.hotspots li {
+  margin: 2px 0;
+}
+
+.hotspots button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hotspots button:hover {
+  text-decoration: underline;
+}
+
+.hotspot-score {
+  color: #bd0026;
+  font-weight: 600;
+}
+
+.download {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #1f4e9c;
+  color: #fff;
+  text-decoration: none;
+}
+
 .swatch-outline {
   background: transparent;
   border: 2.5px solid #1f4e9c;
