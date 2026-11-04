@@ -26,10 +26,20 @@ REGION_DETAIL_SELECT = """
             m.heat_uhi, m.canopy_pct, m.covered_fraction,
             m.heat_scaled, m.canopy_scaled, m.irsd_scaled,
             m.risk_score, m.heat_quintile, m.double_burden,
-            se.irsd_score, se.vic_decile, se.population
+            se.irsd_score, se.vic_decile, se.population,
+            r.risk_rank, r.ranked_count
     FROM sa2 s
     LEFT JOIN region_metrics m USING (sa2_code)
     LEFT JOIN seifa se USING (sa2_code)
+    LEFT JOIN (
+        -- Rank every scored region first, so filtering to one region later can't make it rank 1.
+        -- Same order as /hotspots: highest risk first, ties broken by sa2_code.
+        SELECT  sa2_code,
+                ROW_NUMBER() OVER (ORDER BY risk_score DESC, sa2_code) AS risk_rank,
+                COUNT(*) OVER () AS ranked_count
+        FROM region_metrics
+        WHERE risk_score IS NOT NULL
+    ) r USING (sa2_code)
 """
 
 REGION_SQL = text(REGION_DETAIL_SELECT + "WHERE s.sa2_code = :sa2_code")
