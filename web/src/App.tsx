@@ -18,6 +18,7 @@ function App() {
   const [layer, setLayer] = useState<Layer>("risk")
   const [selectedCode, setSelectedCode] = useState<string | null>(null)
   const [map, setMap] = useState<LeafletMap | null>(null)
+  const [showDoubleBurden, setShowDoubleBurden] = useState(false)
 
   useEffect(() => {
     fetchRegions()
@@ -135,6 +136,14 @@ function App() {
             </label>
           ))}
         </fieldset>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={showDoubleBurden}
+            onChange={(e) => setShowDoubleBurden(e.target.checked)}
+          />
+          Highlight double-burden areas
+        </label>
         {legend.length > 0 && (
           <div className="legend">
             <div className="legend-title">{info.label}</div>
@@ -149,10 +158,6 @@ function App() {
             <div className="legend-row">
               <span className="swatch" style={{ background: NO_DATA }} />
               No data
-            </div>
-            <div className="legend-row">
-              <span className="swatch swatch-outline" />
-              Double burden
             </div>
           </div>
         )}
@@ -175,7 +180,7 @@ function App() {
             }}
           />
         )}
-        {doubleBurden && (
+        {showDoubleBurden && doubleBurden && (
           <GeoJSON
             data={doubleBurden}
             style={{ color: DOUBLE_BURDEN_COLOUR, weight: 2.5, fill: false }}

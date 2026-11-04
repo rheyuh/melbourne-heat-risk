@@ -221,8 +221,10 @@ body,
   text-decoration: none;
 }
 
-.swatch-outline {
-  background: transparent;
-  border: 2.5px solid #1f4e9c;
-  opacity: 1;
+.toggle {
+  display: block;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+  cursor: pointer;
 }
