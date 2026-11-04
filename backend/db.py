@@ -8,5 +8,6 @@ def get_engine(database=None):
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
     db = database or os.environ["POSTGRES_DB"]
+    host = os.environ.get("POSTGRES_HOST", "localhost")
     port = os.environ.get("POSTGRES_PORT", "5432")
-    return create_engine(f"postgresql+psycopg://{user}:{password}@localhost:{port}/{db}")
+    return create_engine(f"postgresql+psycopg://{user}:{password}@{host}:{port}/{db}")
