@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { GeoJSON, MapContainer, TileLayer, ZoomControl } from "react-leaflet"
-import type { LatLngExpression, PathOptions } from "leaflet"
+import { geoJSON, type LatLngExpression, type Map as LeafletMap, type PathOptions } from "leaflet"
 import type { Feature, Geometry } from "geojson"
 import { fetchHotspots, fetchRegion, fetchRegions } from "./api"
 import { HotspotList } from "./HotspotList"
@@ -17,6 +17,7 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [layer, setLayer] = useState<Layer>("risk")
   const [selectedCode, setSelectedCode] = useState<string | null>(null)
+  const [map, setMap] = useState<LeafletMap | null>(null)
 
   useEffect(() => {
     fetchRegions()
@@ -84,6 +85,22 @@ function App() {
     ? { ...regions, features: regions.features.filter((f) => f.properties.double_burden === true) }
     : null
 
+  // Fly to a region, keeping it clear of the 300 px card on the left
+  function zoomTo(sa2Code: string) {
+    const feature = regions?.features.find((f) => f.properties.sa2_code === sa2Code)
+    if (!map || !feature) return
+    map.flyToBounds(geoJSON(feature).getBounds(), {
+      paddingTopLeft: [330, 20],
+      paddingBottomRight: [20, 20],
+      maxZoom: 14,
+    })
+  }
+
+  function selectHotspot(sa2Code: string) {
+    setSelectedCode(sa2Code)
+    zoomTo(sa2Code)
+  }
+
   return (
     <>
       {error && <div className="error">Couldn't load regions: {error}</div>}
@@ -99,7 +116,7 @@ function App() {
             {shownDetail && <RegionDetails detail={shownDetail} />}
           </>
         ) : (
-          <HotspotList hotspots={hotspots} error={hotspotsError} onSelect={setSelectedCode} />
+          <HotspotList hotspots={hotspots} error={hotspotsError} onSelect={selectHotspot} />
         )}
       </aside>
       <div className="panel">
@@ -140,7 +157,7 @@ function App() {
           </div>
         )}
       </div>
-      <MapContainer center={MELBOURNE} zoom={11} className="map" zoomControl={false}>
+      <MapContainer ref={setMap} center={MELBOURNE} zoom={11} className="map" zoomControl={false}>
         <TileLayer
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
