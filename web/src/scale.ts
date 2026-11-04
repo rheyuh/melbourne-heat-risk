@@ -36,3 +36,13 @@ export function colourFor(value: number | null, breaks: number[], reversed = fal
   const i = classIndex(value, breaks)
   return YLORRD[reversed ? YLORRD.length - 1 - i : i]
 }
+
+// Legend text for the five classes, lowest values first (class 0 … 4)
+export function classLabels(breaks: number[], format: (n: number) => string): string[] {
+  const labels = [`below ${format(breaks[0])}`]
+  for (let i = 1; i < breaks.length; i++) {
+    labels.push(`${format(breaks[i - 1])} – ${format(breaks[i])}`)
+  }
+  labels.push(`${format(breaks[breaks.length - 1])} and above`)
+  return labels
+}
