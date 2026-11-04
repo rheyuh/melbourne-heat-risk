@@ -31,7 +31,8 @@ export function classIndex(value: number, breaks: number[]): number {
 }
 
 // Fill colour for one region: grey when there's no data, otherwise its class's colour
-export function colourFor(value: number | null, breaks: number[]): string {
+export function colourFor(value: number | null, breaks: number[], reversed = false): string {
   if (value === null) return NO_DATA
-  return YLORRD[classIndex(value, breaks)]
+  const i = classIndex(value, breaks)
+  return YLORRD[reversed ? YLORRD.length - 1 - i : i]
 }
