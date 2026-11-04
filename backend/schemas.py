@@ -19,6 +19,8 @@ class RegionDetail(BaseModel):
     canopy_scaled: float | None
     irsd_scaled: float | None
     risk_score: float | None
+    risk_rank: int | None       # 1 = highest risk; None when the region has no risk score
+    ranked_count: int | None    # how many regions have a rank (the "of N")
     heat_quintile: int | None
     double_burden: bool | None
     irsd_score: float | None
@@ -36,8 +38,9 @@ class Hotspot(BaseModel):
     canopy_pct: float
     vic_decile: int | None
 
-# Columns for /regions.csv: every RegionDetail field except the nested sources list.
+# Columns for /regions.csv: every RegionDetail field except the nested sources list
+# and ranked_count (the same number on every row).
 REGION_CSV_COLUMNS = []
 for name in RegionDetail.model_fields:
-    if name != "sources":
+    if name not in ("sources", "ranked_count"):
         REGION_CSV_COLUMNS.append(name)
