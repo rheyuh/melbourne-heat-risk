@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { GeoJSON, MapContainer, TileLayer } from "react-leaflet"
+import { GeoJSON, MapContainer, TileLayer, ZoomControl } from "react-leaflet"
 import type { LatLngExpression, PathOptions } from "leaflet"
 import type { Feature, Geometry } from "geojson"
 import { fetchRegions } from "./api"
@@ -14,6 +14,7 @@ function App() {
   const [regions, setRegions] = useState<RegionCollection | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [layer, setLayer] = useState<Layer>("risk")
+  const [selectedCode, setSelectedCode] = useState<string | null>(null)
 
   useEffect(() => {
     fetchRegions()
@@ -50,6 +51,14 @@ function App() {
   return (
     <>
       {error && <div className="error">Couldn't load regions: {error}</div>}
+      {selectedCode && (
+        <aside className="region-card">
+          <button className="close" onClick={() => setSelectedCode(null)} aria-label="Close details">
+            ✕
+          </button>
+          <h2>{selectedCode}</h2>
+        </aside>
+      )}
       <div className="panel">
         <fieldset>
           <legend>Show</legend>
@@ -88,13 +97,23 @@ function App() {
           </div>
         )}
       </div>
-      <MapContainer center={MELBOURNE} zoom={11} className="map">
+      <MapContainer center={MELBOURNE} zoom={11} className="map" zoomControl={false}>
         <TileLayer
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+        <ZoomControl position="bottomright" />
         {regions && (
-          <GeoJSON data={regions} style={styleRegion} />
+          <GeoJSON
+            data={regions}
+            style={styleRegion}
+            eventHandlers={{
+              click: (e) => {
+                const feature = e.propagatedFrom.feature as Feature<Geometry, RegionProperties>
+                setSelectedCode(feature.properties.sa2_code)
+              },
+            }}
+          />
         )}
         {doubleBurden && (
           <GeoJSON

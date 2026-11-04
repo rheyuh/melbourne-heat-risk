@@ -84,6 +84,37 @@ body,
   opacity: 0.7;
 }
 
+.region-card {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  width: 300px;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+.region-card h2 {
+  font-size: 16px;
+  margin: 0 24px 8px 0;
+}
+
+.region-card .close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 0;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .swatch-outline {
   background: transparent;
   border: 2.5px solid #1f4e9c;
