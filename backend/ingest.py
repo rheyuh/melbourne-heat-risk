@@ -1,15 +1,24 @@
+import sys
 from datetime import date
 from sqlalchemy import text
 import geopandas as gpd
 import pandas as pd
 
 from config import (
+    RAW_DATA_DIR,
     SA2_FILE, SA2_LAYER, GREATER_MELBOURNE,
     SEIFA_FILE, SEIFA_SHEET,
     HEAT_VEG_FILE, HEAT_VEG_LAYER,
 )
 
 from db import get_engine
+
+def check_source_files():
+    # Runs before reset_tables, so a missing download never wipes existing data
+    missing = [path for path in (SA2_FILE, SEIFA_FILE, HEAT_VEG_FILE) if not path.exists()]
+    if missing:
+        lines = [f"  - {path.relative_to(RAW_DATA_DIR)}" for path in missing]
+        sys.exit("Missing source files in data/raw (see docs/sources.md):\n" + "\n".join(lines))
 
 def reset_tables(engine):
     with engine.begin() as conn:
@@ -110,6 +119,7 @@ def load_datasets(engine):
     print(f"datasets: {len(df)} rows")
 
 if __name__ == "__main__":
+    check_source_files()
     engine = get_engine()
     reset_tables(engine)
     load_sa2(engine)
