@@ -94,6 +94,21 @@ def test_region_detail_without_metrics_row(client):
     assert body["vic_decile"] == 8
 
 
+def test_region_rank_matches_hotspots(client):
+    # The side panel's rank must agree with the hotspot list for every ranked region.
+    for hotspot in client.get("/hotspots").json():
+        body = client.get(f"/regions/{hotspot['sa2_code']}").json()
+        assert body["risk_rank"] == hotspot["rank"]
+        assert body["ranked_count"] == 5  # S1–S5 have scores
+
+
+@pytest.mark.parametrize("code", ["S6", "S7"], ids=["no score", "no metrics row"])
+def test_unscored_region_has_no_rank(client, code):
+    body = client.get(f"/regions/{code}").json()
+    assert body["risk_rank"] is None
+    assert body["ranked_count"] is None
+
+
 def test_unknown_region_is_404(client):
     assert client.get("/regions/nope").status_code == 404
 
