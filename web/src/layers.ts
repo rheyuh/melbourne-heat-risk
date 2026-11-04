@@ -10,6 +10,7 @@ interface LayerInfo {
   fixedBreaks?: number[]   // use these instead of calculated quintiles
   format: (n: number) => string   // how a break value is shown in the legend
   fixedLabels?: string[]          // legend text per class, when breaks aren't real values
+  note?: string                   // one-line explanation shown in the legend
 }
 
 export const LAYER_INFO: Record<Layer, LayerInfo> = {
@@ -18,6 +19,7 @@ export const LAYER_INFO: Record<Layer, LayerInfo> = {
     value: (p) => p.risk_score,
     reversed: false,
     format: (n) => n.toFixed(2),
+    note: "Heat risk combines urban heat, lack of tree canopy and socio-economic disadvantage, weighted equally.",
   },
   heat: {
     label: "Urban heat",

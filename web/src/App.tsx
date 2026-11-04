@@ -63,6 +63,7 @@ function App() {
         {legend.length > 0 && (
           <div className="legend">
             <div className="legend-title">{info.label}</div>
+            {info.note && <div className="legend-note">{info.note}</div>}
             <div className="legend-hint">Deep red indicates more heat risk</div>
             {legend.map((row) => (
               <div key={row.text} className="legend-row">
