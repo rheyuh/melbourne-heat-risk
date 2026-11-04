@@ -15,8 +15,13 @@ dependencies = [
 dev = [
     "ipython>=9.17.1",
     "pytest>=9.2.0",
+    "ruff>=0.17.3",
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI reads these markers at request time, so a call in the default is intended
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]

@@ -1,17 +1,22 @@
 import sys
 from datetime import date
-from sqlalchemy import text
+
 import geopandas as gpd
 import pandas as pd
+from sqlalchemy import text
 
 from config import (
+    GREATER_MELBOURNE,
+    HEAT_VEG_FILE,
+    HEAT_VEG_LAYER,
     RAW_DATA_DIR,
-    SA2_FILE, SA2_LAYER, GREATER_MELBOURNE,
-    SEIFA_FILE, SEIFA_SHEET,
-    HEAT_VEG_FILE, HEAT_VEG_LAYER,
+    SA2_FILE,
+    SA2_LAYER,
+    SEIFA_FILE,
+    SEIFA_SHEET,
 )
-
 from db import get_engine
+
 
 def check_source_files():
     # Runs before reset_tables, so a missing download never wipes existing data

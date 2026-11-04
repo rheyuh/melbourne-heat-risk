@@ -15,9 +15,13 @@ import geopandas as gpd
 import pandas as pd
 
 from config import (
-    SA2_FILE, SA2_LAYER, GREATER_MELBOURNE,
-    SEIFA_FILE, SEIFA_SHEET,
-    HEAT_VEG_FILE, HEAT_VEG_LAYER,
+    GREATER_MELBOURNE,
+    HEAT_VEG_FILE,
+    HEAT_VEG_LAYER,
+    SA2_FILE,
+    SA2_LAYER,
+    SEIFA_FILE,
+    SEIFA_SHEET,
 )
 
 # Areas must be measured in metres, not degrees, so overlay work uses

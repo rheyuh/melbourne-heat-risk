@@ -4,6 +4,7 @@ import os
 
 from sqlalchemy import create_engine
 
+
 def get_engine(database=None):
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
